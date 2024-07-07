@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const authMiddleware_1 = require("../middleware/authMiddleware");
+const organisationController_1 = require("../controllers/organisationController");
+const router = (0, express_1.Router)();
+router.get('/', authMiddleware_1.authenticate, organisationController_1.getOrganisations);
+router.get('/:orgId', authMiddleware_1.authenticate, organisationController_1.getOrganisation);
+router.post('/', authMiddleware_1.authenticate, organisationController_1.createOrganisation);
+router.post('/:orgId/users', authMiddleware_1.authenticate, organisationController_1.addUserToOrganisation);
+exports.default = router;
