@@ -1,19 +1,28 @@
 import { Sequelize } from 'sequelize';
-import * as dotenv from 'dotenv';
+import dotenv from 'dotenv';
+import { URL } from 'url';
 
 dotenv.config();
 
-const databaseUrl = `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`;
+const dbUrl = process.env.DATABASE_URL;
+if (!dbUrl) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
 
-const sequelize = new Sequelize(databaseUrl, {
+const parsedUrl = new URL(dbUrl);
+
+const sequelize = new Sequelize(parsedUrl.pathname!.slice(1), parsedUrl.username, parsedUrl.password, {
+  host: parsedUrl.hostname,
+  port: Number(parsedUrl.port),
   dialect: 'postgres',
   protocol: 'postgres',
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false,
-    },
+      rejectUnauthorized: false // This line is necessary if you're using self-signed certificates
+    }
   },
+  logging: false,
 });
 
 export default sequelize;
